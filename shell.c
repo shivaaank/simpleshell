@@ -34,9 +34,9 @@ void printhistory(bool deets) {
     //Funtion to print history
     for (int i = 0; i < curcommands; i++) {
         struct timeval start = history[i].time;
-        long seconds = start.tv_sec + 5*3600 + 30*60;
+        long seconds = start.tv_sec + 5*3600 + 30*60; //adjust for IST because linux follows GMT by default.
         long useconds = start.tv_usec; 
-        seconds = seconds%86400;
+        seconds = seconds%86400; //tv_sec gives number of seconds since start of the year so mod by seconds in a day.
         long hours=seconds/3600;
         seconds=seconds-hours*3600;
         long minutes=seconds/60;
@@ -55,7 +55,7 @@ void printhistory(bool deets) {
 void handle_ctrlc(int sig) {
     // Signal handler for Ctrl+C (SIGINT)
     printhistory(true); // Show command history with details
-    exit(0); // Exit the program
+    exit(0);
 }
 
 
