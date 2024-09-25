@@ -34,23 +34,35 @@ void printhistory(bool deets) {
     //Funtion to print history
     for (int i = 0; i < curcommands; i++) {
         struct timeval start = history[i].time;
-        long seconds = start.tv_sec;
-        long useconds = start.tv_usec;
+        long seconds = start.tv_sec + 5*3600 + 30*60;
+        long useconds = start.tv_usec; 
+        seconds = seconds%86400;
+        long hours=seconds/3600;
+        seconds=seconds-hours*3600;
+        long minutes=seconds/60;
+        seconds=seconds-minutes*60;
+         
         printf("Command: %s\n", history[i].command);
         if(deets){ // when exiting
             printf("Program ID: %d\n", history[i].pid);
-            printf("Time: %ld seconds and %ld microseconds\n", seconds, useconds);
+            printf("Time: %ld Hours and %ld minutes and %ld seconds and %ld microseconds\n", hours,minutes,seconds, useconds);
             printf("Duration: %ld microseconds\n", history[i].duration);
             printf("\n");
         }
     }
 }
 
+void handle_ctrlc(int sig) {
+    // Signal handler for Ctrl+C (SIGINT)
+    printhistory(true); // Show command history with details
+    exit(0); // Exit the program
+}
 
 
 int main() {
     
     char fullcmd[n]; //array to store current command.
+    signal(SIGINT, handle_ctrlc);
 
     do {
         printf("AS'S> ");
@@ -128,7 +140,7 @@ int main() {
                     }
                     // Child process: execute the command
                     if (execvp(args[0], args) == -1) {
-                        perror("Child couldn't take it");
+                        perror("Command issue\n");
                     }
                     exit(EXIT_FAILURE);
                 } 
